@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/utils/colors.dart';
 import '../../home/screens/home_screen.dart';
@@ -117,12 +118,16 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                           children: [
                             GestureDetector(
                               onTap:
-                                  () => Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const HomeScreen(),
-                                    ),
-                                  ),
+                                  () async {
+                                    final SharedPreferences prefs = await SharedPreferences.getInstance();
+                                    await prefs.setBool('seen', false);
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const HomeScreen(),
+                                      ),
+                                    );
+                                  },
                               child: Text(
                                 'skip',
                                 style: TextStyle(
@@ -146,7 +151,9 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                           ],
                         )
                         : GestureDetector(
-                          onTap: () {
+                          onTap: () async {
+                            final SharedPreferences prefs = await SharedPreferences.getInstance();
+                            await prefs.setBool('seen', false);
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(

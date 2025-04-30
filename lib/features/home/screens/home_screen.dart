@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meals_app/core/utils/colors.dart';
+import 'package:meals_app/features/home/data/db_helper/db_helper.dart';
+import 'package:meals_app/features/home/screens/add_meal_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    createDatabase().then((value) => fetchMeals());
+    super.initState();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +63,7 @@ class HomeScreen extends StatelessWidget {
             child: GridView.builder(
               padding: const EdgeInsets.all(0),
               physics: const BouncingScrollPhysics(),
-              itemCount: 8,
+              itemCount: meals.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: 2 / 2.3,
@@ -68,15 +81,22 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Image(
-                            image: AssetImage('assets/images/meal.png'),
-                            fit: BoxFit.cover,
+                          child: SizedBox(
+                            height: 120.h,
+                            width: double.infinity,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image(
+                                image: NetworkImage(meals[index]['imageUrl']),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(left: 10.0),
                           child: Text(
-                            'Cheese Burger',
+                            meals[index]['name'],
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.w500,
@@ -94,7 +114,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                               SizedBox(width: 5.w),
                               Text(
-                                '4.5',
+                                meals[index]['rate'],
                                 style: TextStyle(
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w500,
@@ -107,7 +127,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                               SizedBox(width: 5.w),
                               Text(
-                                '20 - 30',
+                                meals[index]['time'],
                                 style: TextStyle(
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w500,
@@ -131,8 +151,26 @@ class HomeScreen extends StatelessWidget {
           side: BorderSide(color: AppColors.orange, width: 5),
         ),
         child: const Icon(Icons.add, color: AppColors.orange, size: 60),
-        onPressed: () {},
+        onPressed: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AddMealScreen()),
+            );
+
+            if (result == true) {
+              await fetchMeals();
+            }
+        },
       ),
     );
   }
+  Future<void> fetchMeals() async {
+    if (database != null) {
+      final data = await getDataFromDatabase(database);
+      setState(() {
+        meals = data;
+      });
+    }
+  }
+
 }

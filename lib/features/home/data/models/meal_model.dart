@@ -1,5 +1,5 @@
 class MealModel {
-  final int id;
+  final int? id;
   final String img;
   final String title;
   final String description;
@@ -7,7 +7,7 @@ class MealModel {
   final String time;
 
   MealModel({
-    required this.id,
+    this.id,
     required this.img,
     required this.title,
     required this.description,
@@ -15,7 +15,7 @@ class MealModel {
     required this.time,
   });
 
-  factory MealModel.fromJson(Map<String, dynamic> json) {
+  factory MealModel.fromJson(Map<dynamic, dynamic> json) {
     return MealModel(
       id: json['id'],
       img: json['img'],
